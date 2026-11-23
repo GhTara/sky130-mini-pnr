@@ -1,0 +1,8 @@
+# XOR2 from 4 NAND2 gates
+INPUT(a)
+INPUT(b)
+OUTPUT(y)
+n1 = NAND(a, b)
+n2 = NAND(a, n1)
+n3 = NAND(b, n1)
+y = NAND(n2, n3)

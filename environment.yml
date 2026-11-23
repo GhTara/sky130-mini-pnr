@@ -1,0 +1,15 @@
+name: sky130-eda
+channels:
+  - litex-hub
+  - conda-forge
+dependencies:
+  - python=3.11
+  - magic        # write the layout, check design rules and extract the circuit
+  - netgen       # compare the extracted circuit with the reference
+  - ngspice      # circuit simulation
+  - numpy
+  - matplotlib
+  - pytest
+  - pip
+  - pip:
+      - ortools==9.11.4210   # CP-SAT placement reference

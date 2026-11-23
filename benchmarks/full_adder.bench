@@ -1,0 +1,12 @@
+# One-bit full adder built from two XOR gates, two AND gates and one OR gate.
+# s is the sum bit and cout is the carry.
+INPUT(a)
+INPUT(b)
+INPUT(cin)
+OUTPUT(s)
+OUTPUT(cout)
+p = XOR(a, b)
+s = XOR(p, cin)
+g = AND(a, b)
+t = AND(p, cin)
+cout = OR(g, t)

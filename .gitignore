@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+work/
+/results/
+# tool by-products (contain local absolute paths)
+*.ext
+*.log
+magic_*.tcl

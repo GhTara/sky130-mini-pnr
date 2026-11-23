@@ -1,0 +1,6 @@
+# AND2 = NAND2 + inverter
+INPUT(a)
+INPUT(b)
+OUTPUT(y)
+n1 = NAND(a, b)
+y = NOT(n1)

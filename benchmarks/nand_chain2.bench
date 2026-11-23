@@ -1,0 +1,7 @@
+# two NAND2 gates in a chain (6 devices)
+INPUT(a)
+INPUT(b)
+INPUT(c)
+OUTPUT(y)
+n1 = NAND(a, b)
+y = NAND(n1, c)
