@@ -1,15 +1,17 @@
 # sky130-mini-pnr
 
-This project places and routes small circuits on SkyWater’s open 130 nm
-process (SKY130). The study compares five ways to arrange the devices
-before routing.
+The study compares five placement methods on eight small circuits using a
+layout algorithm adapted to SkyWater’s open 130 nm process (SKY130).
 
-## Placement algorithm comparison
+## Placement results
 
-The score adds the area of the smallest rectangle enclosing the devices
-(µm²) to their estimated connection length (µm). Lower is better. Each
-entry gives the mean ± sample standard deviation over ten seeds at the
-listed CPU budget per run. ES stands for evolution strategies.
+Annealing with restarts had the lowest mean score on six circuits. It tied
+random search on the inverter and NAND2.
+
+The score adds the area of the smallest rectangle around the devices (µm²)
+to their estimated connection length (µm) before routing. Lower is better.
+Each entry shows the mean ± sample standard deviation over ten seeds at
+the listed CPU budget per run.
 
 | Circuit | CPU budget (s) | Annealing with restarts | ES + REINFORCE | ES | REINFORCE | Random search |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -22,27 +24,30 @@ listed CPU budget per run. ES stands for evolution strategies.
 | c17 | 120 | 148.87 ± 3.47 | 161.49 ± 4.67 | 166.48 ± 7.78 | 180.94 ± 3.13 | 251.15 ± 8.64 |
 | Full adder | 180 | 250.40 ± 5.26 | 274.74 ± 6.89 | 275.79 ± 15.46 | 308.86 ± 9.57 | 461.51 ± 7.75 |
 
-Annealing with restarts had the lowest mean score on six circuits and tied
-random search on the inverter and NAND2. The ES and REINFORCE methods are
-included as results only.
+The three columns using ES (evolution strategies) or REINFORCE report
+results only.
 
 ## Run c17
 
-`PDK_ROOT` points to the directory containing `sky130A/`. [PDK setup](https://github.com/fossi-foundation/ciel#downloading-and-enabling-pdks)
+c17 has six NAND gates. Set `PDK_ROOT` to the directory containing
+`sky130A/`. [PDK setup](https://github.com/fossi-foundation/ciel#downloading-and-enabling-pdks)
 
 ```bash
 micromamba env create -f environment.yml
 micromamba activate sky130-eda
 export PDK_ROOT=/path/to/pdks
 
+# Place whole gates
 python run_flow.py benchmarks/c17.bench --seed 1 --out work/c17
+
+# Place individual transistors and resistors
 python run_device_flow.py benchmarks/c17.bench --seed 1 --placer annealing --guard shared --out work/c17_device
-python -m pytest tests
 ```
 
-The first command places standard cells. The second places individual
-devices. Each writes a GDS layout, a SPICE netlist and a `summary.json`
-with the layout and circuit checks in its output directory.
+The layouts are written to `work/c17/c17.gds` and
+`work/c17_device/c17_dev.gds`. Each directory also contains the extracted
+SPICE circuit and the check results in `summary.json`.
+Run `python -m pytest tests` for the test suite.
 
 The recorded runs used Magic 8.3.465, Netgen 1.5.272, ngspice 42 and
 open_pdks revision `8afc8346a57fe1ab7934ba5a6056ea8b43078e71`.

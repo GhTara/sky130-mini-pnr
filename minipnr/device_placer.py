@@ -46,7 +46,7 @@ class DevicePlacer:
         self.variants.update(variants or {})
         self.foldable = [name for name in self.names if len(self.variants[name]) > 1]
 
-        # centre of each terminal relative to the device origin
+        # Measure terminal centres from the device origin.
         self.terminal_centre = {}
         for kind, layout in layouts.items():
             for name, terminal in layout.terminals.items():
@@ -60,8 +60,6 @@ class DevicePlacer:
                 if terminal != SUBSTRATE_TERMINAL:
                     self.nets.setdefault(net, []).append((device.name, terminal))
         self.nets = {net: pins for net, pins in self.nets.items() if len(pins) > 1}
-
-    # ----- geometry -------------------------------------------------------
 
     def box(self, state):
         x, y, kind = state
@@ -87,8 +85,6 @@ class DevicePlacer:
         return (snap_down(left - bbox[0], ox, u.TRACK_X_PITCH),
                 snap_down(bottom - bbox[1], oy, u.TRACK_Y_PITCH), kind)
 
-    # ----- cost -----------------------------------------------------------
-
     def area_um2(self, placement):
         boxes = [self.box(state) for state in placement.values()]
         width = max(b[2] for b in boxes) - min(b[0] for b in boxes)
@@ -110,11 +106,9 @@ class DevicePlacer:
     def cost(self, placement):
         return self.area_um2(placement) + self.wire_weight * self.hpwl_um(placement)
 
-    # ----- start placement ------------------------------------------------
-
     def random_placement(self, rng, fill=0.5, max_tries=2000):
         """Return a legal random placement, expanding the starting region as needed."""
-        # Draw only when there is a choice. Fixed shapes use no random numbers.
+        # Skip the random draw for devices with only one shape.
         kinds = {}
         for name in self.names:
             variants = self.variants[name]
@@ -144,8 +138,6 @@ class DevicePlacer:
             if len(placement) == len(self.names):
                 return placement
             side = int(side * 1.2)
-
-    # ----- simulated annealing --------------------------------------------
 
     def propose_move(self, placement, rng, max_step):
         """Return a proposed legal placement, or None."""

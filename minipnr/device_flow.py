@@ -68,7 +68,7 @@ class GridBounds:
                 track_y(self.iy_max) + u.TRACK_Y_PITCH // 2)
 
 
-# ----- device cells ----------------------------------------------------
+# Device cells
 
 def run_generator(pdk, work_dir, makes, extra_commands, name):
     """Run Magic with the PDK start-up file (it loads the device generators)."""
@@ -182,7 +182,7 @@ def local_access(layout, name, origin_x, origin_y):
     return access_points(layout, name, origin_x, origin_y, xs, ys)
 
 
-# ----- placement -------------------------------------------------------
+# Placement
 
 def lattice_at_least(value, offset, pitch):
     """Smallest offset + pitch * k that is >= value."""
@@ -207,7 +207,7 @@ def place_in_row(devices, layouts, offsets, device_gap=DEVICE_GAP):
     return placement
 
 
-# ----- routing inputs --------------------------------------------------
+# Router inputs
 
 def make_bounds(devices, layouts, placement, circuit, margin=3, extra_boxes=()):
     boxes = [shift(layouts[d.kind].bbox, *placement[d.name]) for d in devices]
@@ -331,7 +331,7 @@ def device_terminals(devices, layouts, placement, bounds, ring=None):
     return terminals
 
 
-# ----- output ----------------------------------------------------------
+# Layout output
 
 def write_device_mag(path, devices, layouts, placement, routes, bounds, circuit,
                      include_routing=True, ring=None):
@@ -398,7 +398,7 @@ def layout_area_um2(devices, layouts, placement):
     return u.units_to_um(width) * u.units_to_um(height)
 
 
-# ----- complete flow ---------------------------------------------------
+# Full device flow
 
 def run_device_flow(bench_path, out_dir, pdk, period_ns=4.0, placer="row", seed=1,
                     wire_weight=1.0, resistor_folds=(2,), guard="device",
@@ -486,7 +486,7 @@ def run_device_flow(bench_path, out_dir, pdk, period_ns=4.0, placer="row", seed=
              "resistor_extracted_length_um": extracted_lengths,
              "device_bbox_area_um2": round(layout_area_um2(devices, layouts, placement), 3),
              "guard": guard,
-             # devices + every guard ring: the area to compare between guard styles
+             # Include all guard rings when comparing guard styles.
              "cluster_area_um2": round(cluster_area_um2(devices, layouts, placement, ring), 3),
              "routing_iterations": iterations, "route_seconds": round(route_seconds, 3),
              "via1_count": sum(len(r.vias) for r in router.routes.values()),
@@ -494,7 +494,7 @@ def run_device_flow(bench_path, out_dir, pdk, period_ns=4.0, placer="row", seed=
              "routed_wirelength_um": round(u.units_to_um(
                  sum(r.wirelength() for r in router.routes.values())), 3)}
 
-    # Report Magic DRC on the exported GDS and keep the .mag count for comparison.
+    # Check the exported GDS and keep the .mag rule count for comparison.
     drc_mag, _ = run_magic(pdk, out_dir, top, "drc_routed_mag.txt")
     run_magic(pdk, out_dir, f"{top}_devices_only", "drc_devices_only_mag.txt",
               extract=False, write_gds=True)

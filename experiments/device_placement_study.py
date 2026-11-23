@@ -100,7 +100,7 @@ def mean_std(values):
 
 def summarize(rows, out_dir, settings):
     metrics = {"device_bbox_area_um2": "Device box (µm²)"}
-    # The earlier placement and folding files only recorded device and die area.
+    # Older runs did not record the area including guard rings.
     if all("cluster_area_um2" in r for r in rows if r["status"] == "ok"):
         metrics["cluster_area_um2"] = "Box including rings (µm²)"
     metrics.update({"die_area_um2": "Layout area (µm²)",

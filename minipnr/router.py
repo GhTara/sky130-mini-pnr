@@ -125,7 +125,7 @@ class Router:
     def __init__(self, grid, net_terminals):
         self.grid = grid
         self.net_terminals = net_terminals      # net -> [Terminal]
-        # Pin access points are kept free for the net that owns the pin.
+        # Reserve each pin’s access points for its own net.
         self.reserved = {}
         for net, terminals in net_terminals.items():
             for terminal in terminals:
@@ -139,8 +139,6 @@ class Router:
         self.routes = {}
         self.expanded_nodes = 0
         self.conflicts_per_iteration = []
-
-    # ----- costs ------------------------------------------------------
 
     def node_allowed(self, net, node):
         """Hard limits: grid border, fixed obstacles, other nets' pins."""
@@ -159,7 +157,7 @@ class Router:
                 + self.others(net, self.pads, (layer, ix, iy + 1)))
 
     def mcon_conflicts(self, net, ix, iy):
-        # Any mcon right above or below is too close, even of the same net.
+        # Contacts one grid step above or below are too close, even on the same net.
         count = self.pad_conflicts(net, M1, ix, iy)
         count += len(self.mcons.get((ix, iy - 1), set()))
         count += len(self.mcons.get((ix, iy + 1), set()))
@@ -172,8 +170,6 @@ class Router:
     def mcon_cost(self, net, node):
         _, ix, iy = node
         return self.cost(MCON_COST, node, self.mcon_conflicts(net, ix, iy))
-
-    # ----- search -----------------------------------------------------
 
     def neighbours(self, net, node):
         layer, ix, iy = node
@@ -248,8 +244,6 @@ class Router:
                     heapq.heappush(heap, (priority, new_cost, counter, other))
                     counter += 1
         return None
-
-    # ----- one net ----------------------------------------------------
 
     def terminal_costs(self, net, terminal):
         costs = {}
@@ -336,8 +330,6 @@ class Router:
 
         self.routes[net] = route
         return route
-
-    # ----- all nets ---------------------------------------------------
 
     def find_conflicts(self):
         """Nodes that break a rule: shared by nets, or pads too close."""

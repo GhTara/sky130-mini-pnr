@@ -39,7 +39,7 @@ def build_instances(plan, placement, circuit, macros):
     return instances
 
 
-# ----- power ------------------------------------------------------------
+# Power rails
 
 def power_rails(plan):
     """Rail k sits at y = k * ROW_HEIGHT. Even rails are VGND, odd are VPWR."""
@@ -77,7 +77,7 @@ def strap_shapes(plan):
     return shapes
 
 
-# ----- router inputs ----------------------------------------------------
+# Router inputs
 
 def obstacles(plan, instances, macros):
     """Fixed metal shapes: {M1/M2: [(rect, net)]}.
@@ -139,7 +139,7 @@ def build_terminals(plan, circuit, placement, macros):
     return terminals
 
 
-# ----- routing shapes ---------------------------------------------------
+# Routing shapes
 
 def centered(x, y, width, height):
     return (x - width // 2, y - height // 2, x + width // 2, y + height // 2)
@@ -214,8 +214,7 @@ def route_shapes(routes, fixed=None):
             pad_nodes[M1].add((ix, iy))
         for layer_name, stub in route.stubs:
             shapes.setdefault(layer_name, []).append((stub, net))
-        # Where a wire joins fixed metal of its net (e.g. a device terminal),
-        # a full pad makes the joint one solid shape.
+        # A full pad joins the wire to existing metal on the same net.
         joint_nodes = set()
         for layer, ix, iy in route.joint_pads:
             name = "metal1" if layer == M1 else "metal2"
@@ -224,9 +223,8 @@ def route_shapes(routes, fixed=None):
             pad_nodes[layer].add((ix, iy))
             joint_nodes.add((layer, ix, iy))
 
-        # Two pads of this net on vertically neighbouring nodes leave a
-        # 0.08 um gap; fill it so it is one shape. The patch is as wide as
-        # the narrower pad, otherwise a 0.015 um notch is left at the sides.
+        # Two full pads on adjacent rows of the same net leave a 0.08 µm gap.
+        # Match the narrower pad to avoid a 0.015 µm notch.
         via_nodes = set(route.vias)
         for layer, nodes in pad_nodes.items():
             name = "metal1" if layer == M1 else "metal2"
@@ -248,7 +246,7 @@ def route_shapes(routes, fixed=None):
     return shapes
 
 
-# ----- Magic writer -----------------------------------------------------
+# Magic output
 
 def read_mag_header(mag_dir, cell):
     """Timestamp and bounding box of a library cell, used in 'use' records."""

@@ -68,7 +68,7 @@ def run(command, cwd, log_name, timeout=600):
     return result
 
 
-# ----- Magic ------------------------------------------------------------
+# Magic
 
 MAGIC_SCRIPT = """\
 set PDKPATH {pdk_base}
@@ -174,7 +174,7 @@ def parse_drc_report(path):
     return {"total": total, "rules": rules}
 
 
-# ----- Netgen -----------------------------------------------------------
+# Netgen
 
 def read_subckt_ports(spice_path, names):
     """Port order of the requested .subckt definitions."""
@@ -220,7 +220,7 @@ def run_lvs(pdk, work_dir, top, layout_spice, schematic_spice):
             "match": final_text.startswith("Circuits match uniquely") and not property_errors}
 
 
-# ----- ngspice ----------------------------------------------------------
+# ngspice
 
 def write_testbench(path, pdk, circuit, top, extracted_spice, port_order, period_ns):
     """Apply all 2^n input vectors, one every `period_ns`, as binary counter."""

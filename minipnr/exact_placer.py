@@ -63,7 +63,7 @@ def solve_exact(devices, layouts, offsets, device_gap, wire_weight=1.0, hint=Non
     area = model.NewIntVar(0, 4 * span * span, "area")
     model.AddMultiplicationEquality(area, [width, height])
 
-    # pairwise spacing: apart in x OR in y
+    # Each pair of devices needs enough space along at least one axis.
     for i, a in enumerate(names):
         for b in names[i + 1:]:
             gap_x, gap_y = required_gap(device_gap, kind[a], kind[b])
@@ -74,7 +74,7 @@ def solve_exact(devices, layouts, offsets, device_gap, wire_weight=1.0, hint=Non
             model.Add(top[b] + gap_y <= bottom[a]).OnlyEnforceIf(sides[3])
             model.AddBoolOr(sides)
 
-    # HPWL (doubled, so terminal centres on half units stay integer)
+    # Double the pin coordinates so half-unit centres stay exact.
     nets = {}
     for device in devices:
         for terminal, net in device.nets.items():

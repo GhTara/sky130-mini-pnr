@@ -75,8 +75,7 @@ class RouterTest(unittest.TestCase):
     def test_random_nets_have_no_spacing_errors(self):
         rng = random.Random(7)
         for trial in range(5):
-            # Pins on vertically neighbouring nodes could never be legal
-            # (mcon.2), so the random pins keep one free track between them.
+            # Leave a free track between vertically aligned pins to meet mcon.2.
             nodes = []
             while len(nodes) < 12:
                 x, y = rng.randrange(12), rng.randrange(16)

@@ -15,7 +15,7 @@ class Placer:
         self.width_sites = {
             gate.name: macros[gate.cell].width // u.SITE_WIDTH for gate in circuit.gates
         }
-        # Average pin access point, used as the pin location for HPWL.
+        # Use the average access point to estimate each pin’s position.
         self.pin_offsets = {}
         for gate in circuit.gates:
             for pin in gate.pin_nets:
@@ -24,8 +24,6 @@ class Placer:
                 mean_dy = sum(p[1] for p in points) / len(points)
                 self.pin_offsets[(gate.name, pin)] = (mean_dx, mean_dy)
         self.nets = circuit.nets()
-
-    # ----- cost -------------------------------------------------------
 
     def pin_location(self, placement, owner, pin):
         if owner == "PIN":
@@ -43,8 +41,6 @@ class Placer:
 
     def total_hpwl(self, placement):
         return sum(self.net_hpwl(placement, net) for net in self.nets)
-
-    # ----- legality ---------------------------------------------------
 
     def is_free(self, placement, name, row, site):
         """True if `name` fits at (row, site) without overlapping other cells."""
@@ -77,8 +73,6 @@ class Placer:
             else:
                 raise RuntimeError("could not find a legal random placement")
         return placement
-
-    # ----- simulated annealing ----------------------------------------
 
     def propose_move(self, placement, rng):
         """Return a new placement after one random move, or None."""
